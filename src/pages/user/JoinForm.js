@@ -10,7 +10,6 @@ const JoinForm = () => {
         event.preventDefault();
     };
 
-    // 유효성 검사 및 상태 업데이트 함수들
     const checkEmail = (event) => {
         setEmail(event.target.value);
     };

@@ -6,6 +6,10 @@ import {Route, Routes} from "react-router-dom";
 import Home from "./pages/Home";
 import LoginForm from "./pages/user/LoginForm";
 import JoinForm from "./pages/user/JoinForm";
+import BoardDetail from "./pages/board/BoardDetail";
+import BoardSaveForm from "./pages/board/BoardSaveForm";
+import BoardUpdateForm from "./pages/board/BoardUpdateForm";
+import BoardList from "./pages/board/BoardList";
 
 function App() {
   return (
@@ -16,6 +20,11 @@ function App() {
                 <Route path="/" exact={true} element={<Home />} />
                 <Route path="/loginForm" exact={true} element={<LoginForm />} />
                 <Route path="/joinForm" exact={true} element={<JoinForm />} />
+
+                <Route path="/board/list" exact={true} element={<BoardList />} />
+                <Route path="/board/:id" exact={true} element={<BoardDetail />} />
+                <Route path="/board/saveForm" exact={true} element={<BoardSaveForm />} />
+                <Route path="/board/updateForm/:id" exact={true} element={<BoardUpdateForm />} />
             </Routes>
         </Container>
         <Footer />

@@ -97,6 +97,7 @@
     color: #949494;
     cursor: pointer;
     transition: color 0.3s ease;
+    margin-right: 5px;
 }
 
 .custom-comment-font:hover {

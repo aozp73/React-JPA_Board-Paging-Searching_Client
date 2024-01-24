@@ -15,7 +15,7 @@ const Header = () => {
                         <div className="d-flex justify-content-between w-100">
                             <ul className="navbar-nav ms-3">
                                 <li className="nav-item">
-                                    <a className="nav-link" href="/board">게시판</a>
+                                    <Link to="/board/list" className="nav-link">게시판</Link>
                                 </li>
                             </ul>
                             <ul className="navbar-nav me-5">
