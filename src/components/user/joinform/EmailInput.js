@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+/**
+ * 부모 컴포넌트
+ * - pages/user/JoinForm.js
+ * 기능
+ * - 이메일 입력 & onChange: Server 통신 후, 중복 체크
+ * -> 입력 값 확인 후, 부모 컴포넌트 내 validCheck 상태 관리
+ */
 const EmailInput = ({ user, setUser, setValidCheck, validCheck }) => {
     const [emailCheckMessage, setEmailCheckMessage] = useState('');
 

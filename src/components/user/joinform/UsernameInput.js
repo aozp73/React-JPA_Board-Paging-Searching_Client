@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
 
+/**
+ * 부모 컴포넌트
+ * - pages/user/JoinForm.js
+ * 기능
+ * - 유효성 체크 (최대 6글자)
+ * -> 입력 값 확인 후, 부모 컴포넌트 내 validCheck 상태 관리
+ */
 const UsernameInput = ({ user, setUser, setValidCheck, validCheck }) => {
     const [userNameCheckMessage, setUserNameCheckMessage] = useState('');
     const validRegexs = {

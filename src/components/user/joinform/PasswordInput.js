@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
 
+/**
+ * 부모 컴포넌트
+ * - pages/user/JoinForm.js
+ * 기능
+ * - 비밀번호, 비밀번호 확인 체크
+ * - 유효성 체크 (6-12글자 + 숫자-영문자 포함)
+ * -> 입력 값 확인 후, 부모 컴포넌트 내 validCheck 상태 관리
+ */
 const PasswordInput = ({ user, setUser, setValidCheck, validCheck }) => {
     const [passwordCheckMessage, setPasswordCheckMessage] = useState('');
 
