@@ -43,7 +43,7 @@ const JoinForm = () => {
                     } else {
                         // 서버에서 응답이 없거나 요청을 전송할 수 없는 경우
                         console.error('Error:', error.message);
-                        alert("네트워크 오류가 발생했습니다.");
+                        alert("일시적인 서버 오류가 발생했습니다.");
                     }
                 });
 

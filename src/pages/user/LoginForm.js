@@ -9,6 +9,9 @@ const LoginForm = () => {
         password: '',
     });
 
+    const [errorMessage, setErrorMessage] = useState('');
+    const [showError, setShowError] = useState(false);
+
     const changeValue = (e) => {
         setUser({ ...user, [e.target.name]: e.target.value });
     };
@@ -18,10 +21,20 @@ const LoginForm = () => {
 
         axios.post(`http://localhost:8080/api/login`, user)
             .then((res) => {
-                console.log(res);
+                console.log('로그인 성공', res.data);
             })
             .catch(error => {
-                console.log(error);
+                if (error.response) {
+                    if (error.response.status === 400) {
+                        console.error('400 Error:', error.response.data);
+                        setErrorMessage(error.response.data.data);
+                        setShowError(true);
+                    }
+                } else {
+                    console.error('Error:', error.message);
+                    setErrorMessage("일시적인 서버 오류가 발생했습니다.");
+                    setShowError(true);
+                }
             });
     }
 
@@ -29,9 +42,11 @@ const LoginForm = () => {
         <div style={{ marginTop: '70px', marginBottom: '100px' }}>
             <div className="custom-login-container mb-5 mt-5">
                 <form onSubmit={handleLogin}>
-                    <div className="alert alert-danger" style={{ display: 'none' }}>
-                        올바르지 않은 정보입니다.
-                    </div>
+                    {showError && (
+                        <div className="alert alert-danger py-2">
+                            {errorMessage}
+                        </div>
+                    )}
                     <div className="mb-3">
                         <input type="email" name="email" value={user.email} onChange={changeValue}
                                className="form-control" placeholder="이메일" required />
