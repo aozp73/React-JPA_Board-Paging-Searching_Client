@@ -1,14 +1,16 @@
 import React, {useState} from 'react';
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import axios from "axios";
+import {useDispatch} from "react-redux";
 
 const LoginForm = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const [user, setUser] = useState({
         email: '',
         password: '',
     });
-
     const [errorMessage, setErrorMessage] = useState('');
     const [showError, setShowError] = useState(false);
 
@@ -19,9 +21,24 @@ const LoginForm = () => {
     const handleLogin = (e) => {
         e.preventDefault();
 
-        axios.post(`http://localhost:8080/api/login`, user)
+        axios.post(`http://localhost:8080/api/login`, user, { withCredentials: true })
             .then((res) => {
                 console.log('로그인 성공', res.data);
+                const {accessToken, userId, email, username} = res.data.data;
+
+                /**
+                 * refreshToken
+                 * - XSS, CSRF 공격 대비 Cookie에 저장 (httponly,sameSite)
+                 *
+                 * accessToken & userId, email, username
+                 * - redux-persist로 로컬 스토리지 관리
+                 */
+                dispatch({
+                    type: 'LOGIN',
+                    payload: { accessToken, userId, email, username }
+                });
+
+                navigate('/board/list');
             })
             .catch(error => {
                 if (error.response) {
@@ -66,6 +83,7 @@ const LoginForm = () => {
                                 <Link to="/joinForm" className="custom-login-link">회원가입</Link>
                             </div>
                             <div>
+                                {/* 부가 기능, 구현 x */}
                                 <a href="#" className="custom-login-link">비밀번호 찾기</a>
                             </div>
                         </div>

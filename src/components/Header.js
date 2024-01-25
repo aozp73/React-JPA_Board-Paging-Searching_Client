@@ -1,9 +1,17 @@
 import React from 'react';
 import {Link} from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
 
 const Header = () => {
+    const auth = useSelector((state) => state.auth);
+    const { isAuthenticated, username } = auth;
 
-    const isAuthenticated = false;
+    const dispatch = useDispatch();
+    const handleLogout = () => {
+        dispatch({
+            type: 'LOGOUT'
+        });
+    }
 
     return (
         <header>
@@ -22,8 +30,8 @@ const Header = () => {
                                 {isAuthenticated ? (
                                     <li id="statusLogin" className="nav-item">
                                         <div className="d-flex">
-                                            <span className="nav-link me-2">{/* 사용자 이름 */}</span>
-                                            <a className="nav-link" href="/logout">로그아웃</a>
+                                            <span className="nav-link me-2">{username}</span>
+                                            <span className="nav-link nav-link-logout" onClick={handleLogout}>로그아웃</span>
                                         </div>
                                     </li>
                                 ) : (
