@@ -1,8 +1,7 @@
 import React from 'react';
 import {Link, useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import axios from "axios";
-import {store} from "../auth/store";
+import api from "../auth/authInterceptor";
 
 const Header = () => {
     const navigate = useNavigate();
@@ -11,12 +10,8 @@ const Header = () => {
     const dispatch = useDispatch();
 
     const handleLogout = () => {
-        const accessToken = store.getState().auth.accessToken;
 
-        axios.delete(`http://localhost:8080/api/auth/logout`, {
-            headers: {Authorization: `Bearer ${accessToken}`},
-            withCredentials: true
-        })
+        api.delete(`/logout`, {withCredentials: true})
             .then((res) => {
                 console.log('로그아웃 완료:', res.data);
 
