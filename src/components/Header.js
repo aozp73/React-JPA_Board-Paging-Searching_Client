@@ -1,16 +1,35 @@
 import React from 'react';
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
+import axios from "axios";
+import {store} from "../auth/store";
 
 const Header = () => {
+    const navigate = useNavigate();
     const auth = useSelector((state) => state.auth);
     const { isAuthenticated, username } = auth;
-
     const dispatch = useDispatch();
+
     const handleLogout = () => {
-        dispatch({
-            type: 'LOGOUT'
-        });
+        const accessToken = store.getState().auth.accessToken;
+
+        axios.delete(`http://localhost:8080/api/auth/logout`, {
+            headers: {Authorization: `Bearer ${accessToken}`},
+            withCredentials: true
+        })
+            .then((res) => {
+                console.log('로그아웃 완료:', res.data);
+
+                alert("로그아웃 완료");
+                dispatch({type: 'LOGOUT'});
+                navigate('/loginForm');
+            })
+            .catch(error => {
+                console.error('로그아웃 에러:', error);
+
+                dispatch({ type: 'LOGOUT' });
+                navigate('/loginForm');
+            });
     }
 
     return (
