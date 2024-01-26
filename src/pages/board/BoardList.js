@@ -1,7 +1,11 @@
 import React, {useState} from 'react';
 import {Link} from "react-router-dom";
+import {useSelector} from "react-redux";
 
 const BoardList = () => {
+    const auth = useSelector((state) => state.auth);
+    const { isAuthenticated } = auth;
+
     const sampleBoardData = [
         { id: 1, title: "첫 번째 게시글", username: "user1", createdAtFormat: "2022-01-01", views: 100, commentCount: 2 },
         { id: 2, title: "두 번째 게시글", username: "user2", createdAtFormat: "2022-01-02", views: 150, commentCount: 3 },
@@ -49,9 +53,10 @@ const BoardList = () => {
                 </div>
 
                 {/* 글 등록 버튼 */}
+                {isAuthenticated && (
                 <div className="d-flex justify-content-end mb-2">
                     <Link to="/board/saveForm" className="btn btn-secondary btn-sm me-1">글 등록</Link>
-                </div>
+                </div>)}
 
                 {/* 페이지네이션 */}
                 <div className="d-flex justify-content-center">

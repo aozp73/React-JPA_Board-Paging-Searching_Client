@@ -1,6 +1,10 @@
 import React from 'react';
+import {useSelector} from "react-redux";
 
 const BoardDetail = () => {
+    const auth = useSelector((state) => state.auth);
+    const { isAuthenticated } = auth;
+
     const boardData = {
         id: 1,
         title: "게시글 제목",
@@ -26,8 +30,6 @@ const BoardDetail = () => {
 
     const handleCommentDelete = () => {
     };
-
-    const isAuthenticated = true;
 
     return (
         <div style={{ marginTop: '50px', marginBottom: '50px' }}>
