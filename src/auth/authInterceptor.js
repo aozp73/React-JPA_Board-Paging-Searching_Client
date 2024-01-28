@@ -10,7 +10,6 @@ const api = axios.create({
 // 요청 인터셉터
 api.interceptors.request.use(config => {
     const token = store.getState().auth.accessToken;
-    console.log(token)
     if (token) {
         config.headers['Authorization'] = 'Bearer ' + token;
     }

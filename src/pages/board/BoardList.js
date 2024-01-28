@@ -1,33 +1,56 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Link} from "react-router-dom";
 import {useSelector} from "react-redux";
+import axios from "axios";
 
 const BoardList = () => {
     const auth = useSelector((state) => state.auth);
     const { isAuthenticated } = auth;
 
-    const sampleBoardData = [
-        { id: 1, title: "첫 번째 게시글", username: "user1", createdAtFormat: "2022-01-01", views: 100, commentCount: 2 },
-        { id: 2, title: "두 번째 게시글", username: "user2", createdAtFormat: "2022-01-02", views: 150, commentCount: 3 },
-    ];
-
-    const totalPages = 3;
-    const currentPage = 1;
-    const paginationRange = Array.from({ length: totalPages }, (_, i) => i + 1);
+    const [boards, setBoards] = useState([]);
+    const [pageInfo, setPageInfo] = useState({}); // For pagination info
 
     const [searchType, setSearchType] = useState('title');
     const [searchKeyword, setSearchKeyword] = useState('');
 
+    useEffect(() => {
+        fetchBoards();
+    }, []);
+
+    const fetchBoards = async () => {
+        try {
+            axios.get('http://localhost:8080/api/board', {
+                params: {
+                    searchType,
+                    searchKeyword,
+                }
+            })
+                .then(res => {
+                    console.log('게시글 목록 조회 성공', res.data.data);
+                    setBoards(res.data.data.boardList.content);
+                    setPageInfo(res.data.data.pageInfo);
+                });
+
+        } catch (error) {
+            console.error('게시글 목록 조회 실패', error);
+        }
+    };
+
     const handleSearchSubmit = (event) => {
         event.preventDefault();
+        fetchBoards();
     };
+
+    const totalPages = pageInfo.totalPages || 0;
+    const currentPage = pageInfo.currentPage || 1;
+    const paginationRange = Array.from({ length: totalPages }, (_, i) => i + 1);
+
 
     return (
         <div style={{ marginTop: '50px', marginBottom: '50px' }}>
             <div className="custom-board-list-container mb-5 mt-5">
                 <div className="mb-3">
                     <div className="custom-top-layout">
-                        {/* 테이블 헤더 */}
                         <div className="custom-flex-item number"><span>번호</span></div>
                         <div className="custom-flex-item title"><span>제목</span></div>
                         <div className="custom-flex-item author"><span>글쓴이</span></div>
@@ -36,7 +59,7 @@ const BoardList = () => {
                     </div>
 
                     {/* 게시글 목록 */}
-                    {sampleBoardData.map(board => (
+                    {boards.map(board => (
                         <div key={board.id} className="custom-board-layout">
                             <div className="custom-flex-item number custom-board-font"><span>{board.id}</span></div>
                             <div className="custom-flex-item title custom-board-font" style={{ textAlign: 'left' }}>

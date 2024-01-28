@@ -22,7 +22,7 @@ const LoginForm = () => {
         e.preventDefault();
 
         axios.post(`http://localhost:8080/api/login`, user, { withCredentials: true })
-            .then((res) => {
+            .then(res => {
                 console.log('로그인 성공', res.data);
                 const {accessToken, userId, email, username} = res.data.data;
 
