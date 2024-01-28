@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {Link} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 import {useSelector} from "react-redux";
 import axios from "axios";
 
 const BoardList = () => {
+    const location = useLocation();
     const auth = useSelector((state) => state.auth);
     const { isAuthenticated } = auth;
 
@@ -14,37 +15,45 @@ const BoardList = () => {
     const [searchKeyword, setSearchKeyword] = useState('');
 
     useEffect(() => {
-        fetchBoards();
-    }, []);
+        const queryParams = new URLSearchParams(location.search);
+        const page = queryParams.get('page') || 0;
+        const searchType = queryParams.get('searchType') || 'title';
+        const searchKeyword = queryParams.get('searchKeyword') || '';
+        fetchBoards(page, searchType, searchKeyword);
+    }, [location.search]);
 
-    const fetchBoards = async () => {
+    const fetchBoards = async (page = 0, searchType = 'title', searchKeyword = '') => {
         try {
-            axios.get('http://localhost:8080/api/board', {
+            const response = await axios.get('http://localhost:8080/api/board', {
                 params: {
+                    page,
                     searchType,
                     searchKeyword,
                 }
-            })
-                .then(res => {
-                    console.log('게시글 목록 조회 성공', res.data.data);
-                    setBoards(res.data.data.boardList.content);
-                    setPageInfo(res.data.data.pageInfo);
-                });
+            });
 
+            console.log('게시글 목록 조회 성공', response.data.data);
+            setBoards(response.data.data.boardList.content);
+            setPageInfo(response.data.data.pageInfo);
         } catch (error) {
             console.error('게시글 목록 조회 실패', error);
         }
     };
+
+
 
     const handleSearchSubmit = (event) => {
         event.preventDefault();
         fetchBoards();
     };
 
-    const totalPages = pageInfo.totalPages || 0;
-    const currentPage = pageInfo.currentPage || 1;
-    const paginationRange = Array.from({ length: totalPages }, (_, i) => i + 1);
+    const endPage = pageInfo.endPage;
+    const startPage = pageInfo.startPage;
+    const currentPage = pageInfo.currentPage;
+    const paginationRange = Array.from({ length: (endPage - startPage) + 1 }, (_, index) => startPage + index);
 
+    const isFirst = pageInfo.isFirst;
+    const isLast = pageInfo.isLast;
 
     return (
         <div style={{ marginTop: '50px', marginBottom: '50px' }}>
@@ -60,16 +69,16 @@ const BoardList = () => {
 
                     {/* 게시글 목록 */}
                     {boards.map(board => (
-                        <div key={board.id} className="custom-board-layout">
-                            <div className="custom-flex-item number custom-board-font"><span>{board.id}</span></div>
+                        <div key={board.boardId} className="custom-board-layout">
+                            <div className="custom-flex-item number custom-board-font"><span>{board.boardId}</span></div>
                             <div className="custom-flex-item title custom-board-font" style={{ textAlign: 'left' }}>
-                                <a href={`/board/${board.id}`} className="custom-title-alink">
+                                <a href={`/board/${board.boardId}`} className="custom-title-alink">
                                     <span>{board.title}</span>
                                 </a>
                                 {board.commentCount > 0 && <span className="ms-2" style={{ color: '#a2a2a2' }}>({board.commentCount})</span>}
                             </div>
-                            <div className="custom-flex-item author custom-board-font"><span>{board.username}</span></div>
-                            <div className="custom-flex-item date custom-board-font"><span>{board.createdAtFormat}</span></div>
+                            <div className="custom-flex-item author custom-board-font"><span>{board.user.username}</span></div>
+                            <div className="custom-flex-item date custom-board-font"><span>{board.createdAt}</span></div>
                             <div className="custom-flex-item view custom-board-font"><span>{board.views}</span></div>
                         </div>
                     ))}
@@ -84,22 +93,22 @@ const BoardList = () => {
                 {/* 페이지네이션 */}
                 <div className="d-flex justify-content-center">
                     <ul className="pagination">
-                        <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                            <a className="page-link" href={`/board?page=${currentPage - 1}`} aria-label="Previous">
+                        <li className={`page-item ${isFirst ? 'disabled' : ''}`}>
+                            <a className="page-link" href={`/board/list?searchType=${searchType}&searchKeyword=${searchKeyword}&page=${currentPage - 1}`} aria-label="Previous">
                                 <span aria-hidden="true">&laquo;</span>
                             </a>
                         </li>
 
                         {paginationRange.map(pageNum => (
-                            <li key={pageNum} className={`page-item ${pageNum === currentPage ? 'active' : ''}`}>
-                                <a className="page-link" href={`/board?page=${pageNum}`}>
+                            <li key={pageNum} className={`page-item ${pageNum === currentPage? 'active' : ''}`}>
+                                <a className="page-link" href={`/board/list?searchType=${searchType}&searchKeyword=${searchKeyword}&page=${pageNum}`}>
                                     {pageNum}
                                 </a>
                             </li>
                         ))}
 
-                        <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                            <a className="page-link" href={`/board?page=${currentPage + 1}`} aria-label="Next">
+                        <li className={`page-item ${isLast ? 'disabled' : ''}`}>
+                            <a className="page-link" href={`/board/list?searchType=${searchType}&searchKeyword=${searchKeyword}&page=${currentPage + 1}`} aria-label="Next">
                                 <span aria-hidden="true">&raquo;</span>
                             </a>
                         </li>
