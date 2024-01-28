@@ -3,7 +3,6 @@ import {useSelector} from "react-redux";
 import {Link, useParams} from "react-router-dom";
 import axios from "axios";
 import {store} from "../../auth/store";
-import header from "../../components/Header";
 
 const BoardDetail = () => {
     const { boardId } = useParams();
