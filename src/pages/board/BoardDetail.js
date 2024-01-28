@@ -1,11 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {useSelector} from "react-redux";
-import {Link, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import axios from "axios";
 import {store} from "../../auth/store";
+import api from "../../auth/authInterceptor";
 
 const BoardDetail = () => {
-    const { boardId } = useParams();
+    const {boardId} = useParams();
+    const navigate = useNavigate();
     const [board, setBoard] = useState({});
     const [comments, setComments] = useState([]);
 
@@ -39,6 +41,21 @@ const BoardDetail = () => {
     };
 
     const handleBoardDelete = () => {
+        const isConfirmed = window.confirm('게시글을 삭제하시겠습니까?');
+
+        if (isConfirmed) {
+            api.delete(`/board/${boardId}`)
+                .then(res => {
+                    console.log("게시글 삭제 성공", res);
+                    navigate(`/board/list`)
+                })
+                .catch(error => {
+                    console.error('게시글 삭제 실패', error);
+                    alert("일시적인 서버 에러가 발생했습니다.");
+                });
+        } else {
+            console.log('게시글 삭제 취소');
+        }
     };
 
     const handleCommentUpdate = () => {
