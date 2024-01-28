@@ -65,7 +65,11 @@ const BoardUpdateForm = () => {
     };
 
     const handleCancel = () => {
-        navigate(-1);
+        const isConfirmed = window.confirm('페이지를 벗어나면 작성 중인 내용이 저장되지 않습니다. ');
+
+        if (isConfirmed) {
+            navigate(-1);
+        }
     };
 
     return (
