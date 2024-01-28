@@ -1,26 +1,27 @@
 import React, {useEffect, useState} from 'react';
-import {Link, useLocation} from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
 import axios from "axios";
 
 const BoardList = () => {
+    const navigate = useNavigate();
     const location = useLocation();
     const auth = useSelector((state) => state.auth);
     const { isAuthenticated } = auth;
 
     const [boards, setBoards] = useState([]);
-    const [pageInfo, setPageInfo] = useState({}); // For pagination info
+    const [pageInfo, setPageInfo] = useState({});
 
     const [searchType, setSearchType] = useState('title');
     const [searchKeyword, setSearchKeyword] = useState('');
 
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search);
-        const page = queryParams.get('page') || 0;
+        const page = queryParams.get('page');
         const searchType = queryParams.get('searchType') || 'title';
         const searchKeyword = queryParams.get('searchKeyword') || '';
         fetchBoards(page, searchType, searchKeyword);
-    }, [location.search]);
+    }, [location.search]); // URL 쿼리 스트링 변경 시 작동
 
     const fetchBoards = async (page = 0, searchType = 'title', searchKeyword = '') => {
         try {
@@ -35,16 +36,17 @@ const BoardList = () => {
             console.log('게시글 목록 조회 성공', response.data.data);
             setBoards(response.data.data.boardList.content);
             setPageInfo(response.data.data.pageInfo);
+            setSearchType(searchType);
+            setSearchKeyword(searchKeyword);
         } catch (error) {
             console.error('게시글 목록 조회 실패', error);
         }
     };
 
 
-
     const handleSearchSubmit = (event) => {
         event.preventDefault();
-        fetchBoards();
+        navigate(`/board/list?searchType=${searchType}&searchKeyword=${searchKeyword}&page=1`);
     };
 
     const endPage = pageInfo.endPage;
