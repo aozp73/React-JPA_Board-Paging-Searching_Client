@@ -24,7 +24,7 @@ function App() {
                 <Route path="/board/list" exact={true} element={<BoardList />} />
                 <Route path="/board/:boardId" exact={true} element={<BoardDetail />} />
                 <Route path="/board/saveForm" exact={true} element={<BoardSaveForm />} />
-                <Route path="/board/updateForm/:id" exact={true} element={<BoardUpdateForm />} />
+                <Route path="/board/updateForm/:boardId" exact={true} element={<BoardUpdateForm />} />
             </Routes>
         </Container>
         <Footer />
