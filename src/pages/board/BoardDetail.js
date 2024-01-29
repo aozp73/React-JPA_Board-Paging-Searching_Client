@@ -12,6 +12,9 @@ const BoardDetail = () => {
     const [comments, setComments] = useState([]);
     const [postComment, setPostComment] = useState({boardId: boardId, content: ''});
 
+    const [editingCommentId, setEditingCommentId] = useState(null);
+    const [editingCommentContent, setEditingCommentContent] = useState('');
+
     const auth = useSelector((state) => state.auth);
     const { isAuthenticated, userId } = auth;
 
@@ -91,7 +94,16 @@ const BoardDetail = () => {
             });
     };
 
-    const handleCommentUpdate = () => {
+    const startCommentUpdate = (commentId, content) => {
+        setEditingCommentId(commentId);
+        setEditingCommentContent(content);
+    };
+    const cancelCommentUpdate = () => {
+        setEditingCommentId(null);
+        setEditingCommentContent('');
+    };
+
+    const commentUpdate = (commentId) => {
     };
 
     const handleCommentDelete = () => {
@@ -137,22 +149,40 @@ const BoardDetail = () => {
                     </div>
                     <ul className="list-group">
                         {comments.map(comment => (
-                            <li key={comment.id} className={`list-group-item ${comment.isNew ? 'new-comment' : ''}`}>
-                                <div className="mb-2 d-flex justify-content-between">
+                            <li key={comment.commentId} className={`list-group-item ${comment.isNew ? 'new-comment' : ''}`}>
+                                {editingCommentId === comment.commentId ? (
+                                    // 댓글 수정 양식
                                     <div>
-                                        <span className="me-3">{comment.user?.username}</span>
-                                        <span className="custom-comment-font">{comment.createdAt}</span>
-                                    </div>
-                                    {isAuthenticated && userId === comment.user?.userId && comment?.editable && (
-                                        <div>
-                                            <span className="custom-comment-font" onClick={handleCommentUpdate}>수정</span>
-                                            <span className="custom-comment-font" onClick={handleCommentDelete}>삭제</span>
+                                        <input
+                                            type="text"
+                                            className="mt-2 form-control form-control-sm"
+                                            value={editingCommentContent}
+                                            onChange={(e) => setEditingCommentContent(e.target.value)}
+                                        />
+                                        <div className="mt-2 d-flex justify-content-end">
+                                            <span className="custom-comment-font me-2" onClick={() => commentUpdate(comment.commentId)}>수정하기</span>
+                                            <span className="custom-comment-font" onClick={cancelCommentUpdate}>취소</span>
                                         </div>
-                                    )}
-                                </div>
-                                <div>
-                                    <div style={{ fontSize: '14px' }}>{comment.content}</div>
-                                </div>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <div className="mb-2 d-flex justify-content-between">
+                                            <div>
+                                                <span className="me-3">{comment.user?.username}</span>
+                                                <span className="custom-comment-font">{comment.createdAt}</span>
+                                            </div>
+                                            {isAuthenticated && userId === comment.user?.userId && comment?.editable && (
+                                                <div>
+                                                    <span className="custom-comment-font" onClick={() => startCommentUpdate(comment.commentId, comment.content)}>수정</span>
+                                                    <span className="custom-comment-font" onClick={handleCommentDelete}>삭제</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <div style={{ fontSize: '14px' }}>{comment.content}</div>
+                                        </div>
+                                    </div>
+                                )}
                             </li>
                         ))}
                     </ul>
