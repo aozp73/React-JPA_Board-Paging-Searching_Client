@@ -179,3 +179,15 @@
 .pagination .page-link:hover {
     color: #007bff;
 }
+
+@keyframes flashLightGrey {
+    from {
+        background-color: lightgrey;
+    }
+    to {
+        background-color: transparent;
+    }
+}
+.new-comment {
+    animation: flashLightGrey 1.1s forwards;
+}

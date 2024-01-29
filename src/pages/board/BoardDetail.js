@@ -1,15 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import {useSelector} from "react-redux";
 import {Link, useNavigate, useParams} from "react-router-dom";
-import axios from "axios";
 import {store} from "../../auth/store";
 import api from "../../auth/authInterceptor";
+import apiOptional from "../../auth/authOptionalInterceptor";
 
 const BoardDetail = () => {
     const {boardId} = useParams();
     const navigate = useNavigate();
     const [board, setBoard] = useState({});
     const [comments, setComments] = useState([]);
+    const [postComment, setPostComment] = useState({boardId: boardId, content: ''});
 
     const auth = useSelector((state) => state.auth);
     const { isAuthenticated, userId } = auth;
@@ -26,7 +27,7 @@ const BoardDetail = () => {
             headers['Authorization'] = `Bearer ${accessToken}`;
         }
 
-         axios.get(`http://localhost:8080/api/board/${id}`, {headers})
+         apiOptional.get(`/board/${id}`, {headers})
              .then( res => {
                  console.log("게시글 상세 조회 성공", res);
 
@@ -58,11 +59,44 @@ const BoardDetail = () => {
         }
     };
 
+    const handleCommentPost = () => {
+        if (!postComment.content.trim()) {
+            alert("내용을 작성해주세요.");
+            return;
+        }
+
+        api.post(`/comment`, postComment)
+            .then(res => {
+                console.log("댓글 작성 성공", res);
+
+                /**
+                 * 응답 데이터: 추가한 댓글 뿐 아니라, DB의 해당 게시글 전체 댓글
+                 * - 목 적: 댓글 작성 중 추가 작성된 댓글들 로드
+                 * - 추가 기능: 새로 작성된 댓글들 플래시 효과
+                 */
+                const newComments = res.data.data;
+                const existingCommentIds = comments.map(comment => comment.commentId);
+                const updatedComments = newComments.map(comment => ({
+                    ...comment,
+                    isNew: !existingCommentIds.includes(comment.commentId)
+                }));
+                setComments(updatedComments);
+
+                // 댓글 입력 초기화
+                setPostComment({...postComment, content: ''});
+            })
+            .catch(error => {
+                console.error('댓글 작성 실패', error);
+                alert("일시적인 서버 에러가 발생했습니다.");
+            });
+    };
+
     const handleCommentUpdate = () => {
     };
 
     const handleCommentDelete = () => {
     };
+
 
     return (
         <div style={{ marginTop: '50px', marginBottom: '50px' }}>
@@ -103,13 +137,13 @@ const BoardDetail = () => {
                     </div>
                     <ul className="list-group">
                         {comments.map(comment => (
-                            <li key={comment.id} className="list-group-item">
+                            <li key={comment.id} className={`list-group-item ${comment.isNew ? 'new-comment' : ''}`}>
                                 <div className="mb-2 d-flex justify-content-between">
                                     <div>
-                                        <span className="me-3">{comment.user.username}</span>
+                                        <span className="me-3">{comment.user?.username}</span>
                                         <span className="custom-comment-font">{comment.createdAt}</span>
                                     </div>
-                                    {isAuthenticated && userId === comment.user.userId && comment?.editable && (
+                                    {isAuthenticated && userId === comment.user?.userId && comment?.editable && (
                                         <div>
                                             <span className="custom-comment-font" onClick={handleCommentUpdate}>수정</span>
                                             <span className="custom-comment-font" onClick={handleCommentDelete}>삭제</span>
@@ -127,10 +161,11 @@ const BoardDetail = () => {
                 {isAuthenticated && (
                     <form className="ms-1">
                         <div className="mb-2">
-                            <textarea className="form-control" id="commentContent" name="commentContent" rows="3"></textarea>
+                            <textarea className="form-control" name="commentContent" rows="3" value={postComment.content}
+                            onChange={e => {setPostComment({...postComment, content: e.target.value})}} />
                         </div>
                         <div className="d-flex justify-content-end">
-                            <button type="button" className="btn btn-primary">댓글 작성</button>
+                            <button type="button" className="btn btn-primary" onClick={handleCommentPost}>댓글 작성</button>
                         </div>
                     </form>
                 )}

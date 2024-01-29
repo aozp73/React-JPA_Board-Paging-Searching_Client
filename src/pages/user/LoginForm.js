@@ -41,16 +41,15 @@ const LoginForm = () => {
                 navigate('/board/list');
             })
             .catch(error => {
-                if (error.response) {
-                    if (error.response.status === 400) {
+                if (error.response.status === 400) {
                         console.error('400 Error:', error.response.data);
                         setErrorMessage(error.response.data.data);
                         setShowError(true);
                     }
-                } else {
+                 else {
                     console.error('Error:', error.message);
-                    setErrorMessage("일시적인 서버 오류가 발생했습니다.");
                     setShowError(true);
+                    setErrorMessage("일시적인 서버 오류가 발생했습니다.");
                 }
             });
     }
