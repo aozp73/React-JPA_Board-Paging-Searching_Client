@@ -2,9 +2,9 @@ import React, {useEffect, useState} from 'react';
 import {Link, useLocation} from "react-router-dom";
 import {useSelector} from "react-redux";
 import axios from "axios";
-import BoardItem from "../../components/board/boardlist/BoardItem";
 import SearchForm from "../../components/board/boardlist/SearchForm";
 import Pagination from "../../components/board/boardlist/Pagination";
+import BoardListItem from "../../components/board/boardlist/BoardListItem";
 
 const BoardList = () => {
     const location = useLocation();
@@ -57,7 +57,7 @@ const BoardList = () => {
                         <div className="custom-flex-item view"><span>조회</span></div>
                     </div>
                     {/* 게시글 목록 */}
-                    {boards.map(board => <BoardItem key={board.boardId} board={board} />)}
+                    {boards.map(board => <BoardListItem key={board.boardId} board={board} />)}
                 </div>
 
                 {/* 게시글 등록 버튼 */}

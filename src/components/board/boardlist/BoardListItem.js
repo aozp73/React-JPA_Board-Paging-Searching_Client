@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from "react-router-dom";
 
-const BoardItem = ({ board }) => {
+const BoardListItem = ({ board }) => {
     return (
             <div className="custom-board-layout">
                 <div className="custom-flex-item number custom-board-font"><span>{board.boardId}</span></div>
@@ -19,4 +19,4 @@ const BoardItem = ({ board }) => {
     );
 };
 
-export default BoardItem;
+export default BoardListItem;
