@@ -43,7 +43,7 @@ const BoardDetail = () => {
          });
     };
 
-    const handleBoardDelete = () => {
+    const boardDelete = () => {
         const isConfirmed = window.confirm('게시글을 삭제하시겠습니까?');
 
         if (isConfirmed) {
@@ -61,7 +61,7 @@ const BoardDetail = () => {
         }
     };
 
-    const handleCommentPost = () => {
+    const commentPost = () => {
         if (!postComment.content.trim()) {
             alert("내용을 작성해주세요.");
             return;
@@ -71,7 +71,7 @@ const BoardDetail = () => {
             .then(res => {
                 console.log("댓글 작성 성공", res);
 
-                rederingAllComment(res);
+                renderingAllComment(res);
                 setPostComment({...postComment, content: ''});
             })
             .catch(error => {
@@ -88,13 +88,16 @@ const BoardDetail = () => {
     };
 
     const commentUpdate = () => {
-        console.log(updateComment)
+        if (!updateComment.content.trim()) {
+            alert("내용을 작성해주세요.");
+            return;
+        }
 
-        api.put(`/comment/` + updateComment.boardId+ '/' + updateComment.commentId, updateComment)
+        api.put(`/comment/${updateComment.boardId}/${updateComment.commentId}`, updateComment)
             .then(res => {
                 console.log("댓글 수정 성공", res);
 
-                rederingAllComment(res);
+                renderingAllComment(res);
                 setUpdateComment({...updateComment, commentId: null, content: ''});
             })
             .catch(error => {
@@ -103,7 +106,7 @@ const BoardDetail = () => {
             });
     };
 
-    const rederingAllComment = (res) => {
+    const renderingAllComment = (res) => {
         /**
          * 응답 데이터: 추가한 댓글 뿐 아니라, DB의 해당 게시글 전체 댓글
          * - 목 적: 댓글 작성 중 추가 작성된 댓글들 로드
@@ -118,7 +121,23 @@ const BoardDetail = () => {
         setComments(updatedComments);
     }
 
-    const handleCommentDelete = () => {
+    const commentDelete = (commentId) => {
+        const isConfirmed = window.confirm('댓글을 삭제하시겠습니까?');
+
+        if (isConfirmed) {
+            api.delete(`/comment/${boardId}/${commentId}`)
+                .then(res => {
+                    console.log("댓글 삭제 성공", res);
+
+                    renderingAllComment(res);
+                })
+                .catch(error => {
+                    console.error('게시글 삭제 실패', error);
+                    alert("일시적인 서버 에러가 발생했습니다.");
+                });
+        } else {
+            console.log('댓글 삭제 취소');
+        }
     };
 
 
@@ -144,7 +163,7 @@ const BoardDetail = () => {
                         <Link to={`/board/updateForm/${boardId}`} className="btn btn-secondary btn-sm me-1">
                             수정
                         </Link>
-                        <button className="btn btn-secondary btn-sm" onClick={handleBoardDelete}>
+                        <button className="btn btn-secondary btn-sm" onClick={boardDelete}>
                             삭제
                         </button>
                     </div>
@@ -163,7 +182,6 @@ const BoardDetail = () => {
                         {comments.map(comment => (
                             <li key={comment.commentId} className={`list-group-item ${comment.isNew ? 'new-comment' : ''}`}>
                                 {updateComment.commentId === comment.commentId ? (
-                                    // 댓글 수정 양식
                                     <div>
                                         <input
                                             type="text"
@@ -186,7 +204,7 @@ const BoardDetail = () => {
                                             {isAuthenticated && userId === comment.user?.userId && comment?.editable && (
                                                 <div>
                                                     <span className="custom-comment-font" onClick={() => startCommentUpdate(comment.commentId, comment.content)}>수정</span>
-                                                    <span className="custom-comment-font" onClick={handleCommentDelete}>삭제</span>
+                                                    <span className="custom-comment-font" onClick={() => commentDelete(comment.commentId)}>삭제</span>
                                                 </div>
                                             )}
                                         </div>
@@ -207,7 +225,7 @@ const BoardDetail = () => {
                             onChange={e => {setPostComment({...postComment, content: e.target.value})}} />
                         </div>
                         <div className="d-flex justify-content-end">
-                            <button type="button" className="btn btn-primary" onClick={handleCommentPost}>댓글 작성</button>
+                            <button type="button" className="btn btn-primary" onClick={commentPost}>댓글 작성</button>
                         </div>
                     </form>
                 )}
