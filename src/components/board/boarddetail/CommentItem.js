@@ -1,13 +1,27 @@
 // CommentsSection.jsx
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import api from "../../../auth/authInterceptor";
 
 const CommentsSection = ({ comments, setComments, updateComment, setUpdateComment, isAuthenticated, userId, boardId }) => {
+
+    // 댓글 수정 Form - textarea 높이 세팅
+    const textareaRef = useRef(null);
+
+    useEffect(() => {
+        const adjustHeight = () => {
+            const textarea = textareaRef.current;
+            if (textarea) {
+                textarea.style.height = `${textarea.scrollHeight}px`;
+            }
+        };
+        adjustHeight();
+    }, [updateComment.content]);
 
     // 기본 상태 - 댓글 수정 Form으로 렌더링
     const startCommentUpdate = (commentId, content) => {
         setUpdateComment({...updateComment, commentId: commentId, content: content});
     };
+
     // 댓글 수정 Form - 취소
     const cancelCommentUpdate = () => {
         setUpdateComment({...updateComment, commentId: null, content: ''});
@@ -78,16 +92,23 @@ const CommentsSection = ({ comments, setComments, updateComment, setUpdateCommen
                     <li key={comment.commentId} className={`list-group-item ${comment.isNew ? 'new-comment' : ''}`}>
                         {updateComment.commentId === comment.commentId ? (
                             <div>
-                                <input
-                                    type="text"
-                                    className="mt-2 form-control form-control-sm"
+                                <div className="mb-3 d-flex justify-content-between">
+                                    <div>
+                                        <span className="me-3">{comment.user?.username}</span>
+                                        <span className="custom-comment-font">{comment.createdAt}</span>
+                                    </div>
+                                    <div>
+                                        <span className="custom-comment-font me-2" onClick={commentUpdate}>수정하기</span>
+                                        <span className="custom-comment-font" onClick={cancelCommentUpdate}>취소</span>
+                                    </div>
+                                </div>
+                                <textarea
+                                    ref={textareaRef}
+                                    className="form-control form-control-sm my-2"
                                     value={updateComment.content}
                                     onChange={(e) => setUpdateComment({ ...updateComment, content: e.target.value })}
+                                    style={{overflowY: 'hidden'}}
                                 />
-                                <div className="mt-2 d-flex justify-content-end">
-                                    <span className="custom-comment-font me-2" onClick={commentUpdate}>수정하기</span>
-                                    <span className="custom-comment-font" onClick={cancelCommentUpdate}>취소</span>
-                                </div>
                             </div>
                         ) : (
                             <div>
@@ -104,7 +125,7 @@ const CommentsSection = ({ comments, setComments, updateComment, setUpdateCommen
                                     )}
                                 </div>
                                 <div>
-                                    <div style={{ fontSize: '14px' }}>{comment.content}</div>
+                                    <div style={{ fontSize: '14px', whiteSpace:"pre" }}>{comment.content}</div>
                                 </div>
                             </div>
                         )}

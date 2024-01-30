@@ -49,7 +49,7 @@ const BoardDetailItem = ({ board, boardId, isAuthenticated, userId }) => {
                     </button>
                 </div>
             )}
-            <div className="ms-2 py-3">{board.content}</div>
+            <div className="ms-2 py-3" style={{whiteSpace:"pre"}}>{board.content}</div>
             <hr/>
         </div>
     );
